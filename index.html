@@ -1246,6 +1246,7 @@
     const epg = document.getElementById("epg");
     const epgList = document.getElementById("epg-list");
     let currentIndex = 0;
+    let closeListTimeout;
 
     const googleDriveVideos = [
       { src: "https://drive.google.com/file/d/1app5Yc_gE8uo-9VDnfqR6slB0o0HCBzs/preview", duration: 7 * 3600 + 49 * 60 + 53 },
@@ -1362,7 +1363,15 @@
         isGoogleDriveVideoSelected = false;
       } else {
         channelList.classList.add("open");
+        startCloseListTimeout();
       }
+    };
+
+    const startCloseListTimeout = () => {
+      clearTimeout(closeListTimeout);
+      closeListTimeout = setTimeout(() => {
+        channelList.classList.remove("open");
+      }, 4000);
     };
 
     document.addEventListener("keydown", (e) => {
@@ -1372,12 +1381,14 @@
         if (channelList.classList.contains("open")) {
           currentIndex = (currentIndex + 1) % channelItems.length;
           updateVisualSelection();
+          startCloseListTimeout();
         }
       } else if (e.key === "ArrowUp") {
         if (channelList.classList.contains("open")) {
           currentIndex =
             (currentIndex - 1 + channelItems.length) % channelItems.length;
           updateVisualSelection();
+          startCloseListTimeout();
         }
       } else if (e.key === "ArrowRight") {
         if (channelList.classList.contains("open")) {
@@ -1400,6 +1411,10 @@
         updateVideoSource();
       });
     });
+
+    channelList.addEventListener("mousemove", startCloseListTimeout);
+    channelList.addEventListener("touchstart", startCloseListTimeout);
+    channelList.addEventListener("touchmove", startCloseListTimeout);
 
     playerContainer.addEventListener("click", openChannelMenu);
     playerContainer.addEventListener("touchend", openChannelMenu);
